@@ -1,18 +1,8 @@
 package form;
 
-
-import controller.*;import java.awt.*;import java.time.LocalDate;import javax.swing.*;import javax.swing.table.DefaultTableModel;import model.*;import util.*;
-
-public class LaporanFrame extends JPanel{private final PemasukanController pc=new PemasukanController();private final PengeluaranController gc=new PengeluaranController();private final JTextField awal=UIUtils.textField(10),akhir=UIUtils.textField(10);private final JLabel ringkasan=new JLabel();private final DefaultTableModel m=new DefaultTableModel(new Object[]{"Tanggal","Jenis","Kategori","Pemasukan","Pengeluaran","Keterangan"},0){public boolean isCellEditable(int r,int c){return false;}};private final JTable table=new JTable(m);
- public LaporanFrame(){setLayout(new BorderLayout());JPanel p=UIUtils.page("Laporan Keuangan");awal.setText(LocalDate.now().withDayOfMonth(1).toString());akhir.setText(LocalDate.now().toString());p.add(content(),BorderLayout.CENTER);add(p);load();}
- private JPanel content(){JPanel p=UIUtils.card();p.setLayout(new BorderLayout(8,8));JPanel f=UIUtils.toolbar();JButton tampil=UIUtils.primaryButton("Tampilkan"),pdf=UIUtils.secondaryButton("Export PDF"),cetak=UIUtils.secondaryButton("Print"),pdf2=UIUtils.secondaryButton("Cetak PDF");ringkasan.setFont(UIUtils.FONT_BOLD);f.add(new JLabel("Tanggal Awal"));f.add(awal);f.add(new JLabel("Tanggal Akhir"));f.add(akhir);f.add(tampil);f.add(pdf);f.add(pdf2);f.add(cetak);p.add(f,BorderLayout.NORTH);p.add(UIUtils.tableScroll(table),BorderLayout.CENTER);p.add(ringkasan,BorderLayout.SOUTH);tampil.addActionListener(e->load());pdf.addActionListener(e->UIUtils.exportTableToPdf(this,table,"Laporan Keuangan Kas Sekolah",ringkasan.getText()));pdf2.addActionListener(e->UIUtils.exportTableToPdf(this,table,"Laporan Keuangan Kas Sekolah",ringkasan.getText()));cetak.addActionListener(e->print());return p;}
- private void load(){LocalDate a=Validator.date("Tanggal awal",awal.getText()),b=Validator.date("Tanggal akhir",akhir.getText());if(a==null||b==null)return;if(b.isBefore(a)){JOptionPane.showMessageDialog(this,"Tanggal akhir tidak boleh sebelum tanggal awal.");return;}try{m.setRowCount(0);for(Pemasukan x:pc.getByDate(a,b))m.addRow(new Object[]{x.getTanggal(),"Pemasukan",x.getKategori(),UIUtils.rupiah(x.getNominal()),"-",x.getKeterangan()});for(Pengeluaran x:gc.getByDate(a,b))m.addRow(new Object[]{x.getTanggal(),"Pengeluaran",x.getKategori(),"-",UIUtils.rupiah(x.getNominal()),x.getKeterangan()});double masuk=pc.total(a,b),keluar=gc.total(a,b);ringkasan.setText("Total Pemasukan: "+UIUtils.rupiah(masuk)+"    Total Pengeluaran: "+UIUtils.rupiah(keluar)+"    Saldo Kas: "+UIUtils.rupiah(masuk-keluar));}catch(Exception e){JOptionPane.showMessageDialog(this,"Gagal memuat laporan: "+e.getMessage());}}
- private void print(){try{table.print(JTable.PrintMode.FIT_WIDTH,null,null);}catch(Exception e){JOptionPane.showMessageDialog(this,"Gagal print: "+e.getMessage());}}
-
 import controller.PemasukanController;
 import controller.PengeluaranController;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.time.LocalDate;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -21,78 +11,15 @@ import model.Pengeluaran;
 import util.UIUtils;
 
 public class LaporanFrame extends JPanel {
-  private final PemasukanController pemasukanController =
-      new PemasukanController();
-  private final PengeluaranController pengeluaranController =
-      new PengeluaranController();
-  private final JTextField txtAwal = UIUtils.textField(10),
-                           txtAkhir = UIUtils.textField(10);
-  private final JLabel lblRingkasan = new JLabel();
-  private final DefaultTableModel model = new DefaultTableModel(
-      new Object[] {"Tanggal", "Jenis", "Uraian", "Pemasukan", "Pengeluaran",
-                    "Keterangan"},
-      0) {
-    public boolean isCellEditable(int r, int c) { return false; }
-  };
-  private final JTable table = new JTable(model);
-  public LaporanFrame() {
-    setLayout(new BorderLayout(12, 12));
-    setBackground(UIUtils.LIGHT_BLUE);
-    setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
-    add(UIUtils.title("Laporan Keuangan"), BorderLayout.NORTH);
-    txtAwal.setText(LocalDate.now().withDayOfMonth(1).toString());
-    txtAkhir.setText(LocalDate.now().toString());
-    add(filterPanel(), BorderLayout.CENTER);
-  }
-  private JPanel filterPanel() {
-    JPanel wrap = UIUtils.card();
-    wrap.setLayout(new BorderLayout(8, 8));
-    JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    top.setOpaque(false);
-    var tampil = UIUtils.primaryButton("Tampilkan");
-    lblRingkasan.setFont(UIUtils.FONT_BOLD);
-    top.add(new JLabel("Tanggal Awal"));
-    top.add(txtAwal);
-    top.add(new JLabel("Tanggal Akhir"));
-    top.add(txtAkhir);
-    top.add(tampil);
-    wrap.add(top, BorderLayout.NORTH);
-    wrap.add(UIUtils.tableScroll(table), BorderLayout.CENTER);
-    wrap.add(lblRingkasan, BorderLayout.SOUTH);
-    tampil.addActionListener(e -> loadReport());
-    loadReport();
-    return wrap;
-  }
-  private void loadReport() {
-    LocalDate awal = UIUtils.parseDate(txtAwal.getText());
-    LocalDate akhir = UIUtils.parseDate(txtAkhir.getText());
-    if (awal == null || akhir == null)
-      return;
-    if (akhir.isBefore(awal)) {
-      JOptionPane.showMessageDialog(
-          this, "Tanggal akhir tidak boleh sebelum tanggal awal");
-      return;
-    }
-    try {
-      model.setRowCount(0);
-      for (Pemasukan p : pemasukanController.getByDate(awal, akhir))
-        model.addRow(new Object[] {
-            p.getTanggal(), "Pemasukan", p.getSumberDana(),
-            UIUtils.rupiah(p.getNominal()), "-", p.getKeterangan()});
-      for (Pengeluaran p : pengeluaranController.getByDate(awal, akhir))
-        model.addRow(
-            new Object[] {p.getTanggal(), "Pengeluaran", p.getKeperluan(), "-",
-                          UIUtils.rupiah(p.getNominal()), p.getKeterangan()});
-      double masuk = pemasukanController.total(awal, akhir);
-      double keluar = pengeluaranController.total(awal, akhir);
-      lblRingkasan.setText(
-          "Total Pemasukan: " + UIUtils.rupiah(masuk) +
-          "    Total Pengeluaran: " + UIUtils.rupiah(keluar) +
-          "    Saldo Akhir: " + UIUtils.rupiah(masuk - keluar));
-    } catch (Exception e) {
-      JOptionPane.showMessageDialog(this, "Gagal tampilkan laporan: " +
-                                              e.getMessage());
-    }
-  }
-
+  private final PemasukanController pemasukan=new PemasukanController();
+  private final PengeluaranController pengeluaran=new PengeluaranController();
+  private final JTextField awal=UIUtils.textField(12), akhir=UIUtils.textField(12);
+  private final JLabel totalMasuk=new JLabel(), totalKeluar=new JLabel(), saldo=new JLabel();
+  private final DefaultTableModel model=new DefaultTableModel(new Object[]{"Tanggal","Jenis","Kategori","Nominal","Keterangan"},0){public boolean isCellEditable(int r,int c){return false;}};
+  private final JTable table=new JTable(model);
+  public LaporanFrame(){setLayout(new BorderLayout()); add(build(),BorderLayout.CENTER); tampilkan();}
+  private JPanel build(){JPanel page=UIUtils.page("Laporan"); awal.setText(LocalDate.now().withDayOfMonth(1).toString()); akhir.setText(LocalDate.now().toString()); JButton show=UIUtils.button("Tampilkan",UIUtils.BLUE), cetak=UIUtils.button("Cetak PDF",Color.GRAY); show.addActionListener(e->tampilkan()); cetak.addActionListener(e->UIUtils.exportTableToPdf(this,table,"Laporan Kas Sekolah",summary())); JPanel filter=new JPanel(new FlowLayout(FlowLayout.LEFT,10,0)); filter.setOpaque(false); filter.add(UIUtils.formLabel("Tanggal Awal")); filter.add(awal); filter.add(UIUtils.formLabel("Tanggal Akhir")); filter.add(akhir); filter.add(show); filter.add(cetak); JPanel cards=new JPanel(new GridLayout(1,3,14,14)); cards.setOpaque(false); cards.add(labelCard("Total Pemasukan",totalMasuk,UIUtils.GREEN)); cards.add(labelCard("Total Pengeluaran",totalKeluar,UIUtils.RED)); cards.add(labelCard("Saldo Akhir",saldo,UIUtils.BLUE)); JPanel center=new JPanel(new BorderLayout(0,14)); center.setOpaque(false); JPanel top=new JPanel(new BorderLayout(0,14)); top.setOpaque(false); top.add(filter,BorderLayout.NORTH); top.add(cards,BorderLayout.CENTER); center.add(top,BorderLayout.NORTH); center.add(UIUtils.tableScroll(table),BorderLayout.CENTER); page.add(center,BorderLayout.CENTER); return page;}
+  private JPanel labelCard(String title,JLabel value,Color color){JPanel c=UIUtils.card(); c.setLayout(new GridLayout(2,1)); JLabel t=new JLabel(title); t.setFont(UIUtils.FONT_BOLD); t.setForeground(UIUtils.MUTED); value.setFont(new Font("Segoe UI",Font.BOLD,20)); value.setForeground(color); c.add(t); c.add(value); return c;}
+  private void tampilkan(){try{LocalDate a=LocalDate.parse(awal.getText().trim()), b=LocalDate.parse(akhir.getText().trim()); model.setRowCount(0); for(Pemasukan p:pemasukan.getByRange(a,b)) model.addRow(new Object[]{p.getTanggal(),"Pemasukan",p.getKategori(),UIUtils.rupiah(p.getNominal()),p.getKeterangan()}); for(Pengeluaran p:pengeluaran.getByRange(a,b)) model.addRow(new Object[]{p.getTanggal(),"Pengeluaran",p.getKategori(),UIUtils.rupiah(p.getNominal()),p.getKeterangan()}); double m=pemasukan.total(a,b), k=pengeluaran.total(a,b); totalMasuk.setText(UIUtils.rupiah(m)); totalKeluar.setText(UIUtils.rupiah(k)); saldo.setText(UIUtils.rupiah(m-k));}catch(Exception e){JOptionPane.showMessageDialog(this,e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);}}
+  private String summary(){return "Total Pemasukan: "+totalMasuk.getText()+" | Total Pengeluaran: "+totalKeluar.getText()+" | Saldo Akhir: "+saldo.getText();}
 }
