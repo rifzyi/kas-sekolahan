@@ -2,6 +2,7 @@ CREATE DATABASE IF NOT EXISTS kas_sekolah CHARACTER SET utf8mb4 COLLATE utf8mb4_
 USE kas_sekolah;
 
 CREATE TABLE IF NOT EXISTS users (
+
   id_user INT AUTO_INCREMENT PRIMARY KEY,
   nama VARCHAR(100) NOT NULL,
   username VARCHAR(50) NOT NULL UNIQUE,
@@ -113,3 +114,4 @@ SELECT 'Kegiatan Sekolah' WHERE NOT EXISTS (SELECT 1 FROM kategori_pengeluaran W
 INSERT INTO pengaturan (nama_sekolah, alamat, telepon, email, kepala_sekolah, bendahara, logo_path)
 SELECT 'MI Nahdlotut Tholibin', '-', '-', '-', '-', '-', ''
 WHERE NOT EXISTS (SELECT 1 FROM pengaturan);
+
