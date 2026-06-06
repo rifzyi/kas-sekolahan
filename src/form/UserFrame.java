@@ -1,5 +1,16 @@
 package form;
 
+
+import controller.UserController;import java.awt.*;import javax.swing.*;import javax.swing.table.DefaultTableModel;import model.User;import util.*;
+
+public class UserFrame extends JPanel{private final UserController c=new UserController();private final JTextField nama=UIUtils.textField(18),username=UIUtils.textField(18),cari=UIUtils.textField(18);private final JPasswordField password=new JPasswordField(18);private final JComboBox<String> role=new JComboBox<>(new String[]{"Admin","Bendahara"});private final DefaultTableModel m=new DefaultTableModel(new Object[]{"ID","Nama","Username","Password","Role"},0){public boolean isCellEditable(int r,int c){return false;}};private final JTable table=new JTable(m);private int id=0;
+ public UserFrame(){setLayout(new BorderLayout());JPanel p=UIUtils.page("Data User");password.setBorder(nama.getBorder());p.add(form(),BorderLayout.WEST);p.add(tabel(),BorderLayout.CENTER);add(p);load("");}
+ private JPanel form(){JPanel p=UIUtils.card();p.setLayout(new GridBagLayout());GridBagConstraints g=new GridBagConstraints();g.insets=new Insets(6,6,6,6);g.fill=GridBagConstraints.HORIZONTAL;row(p,g,0,"Nama",nama);row(p,g,1,"Username",username);row(p,g,2,"Password",password);row(p,g,3,"Role",role);JPanel b=UIUtils.toolbar();JButton tambah=UIUtils.secondaryButton("Tambah"),simpan=UIUtils.primaryButton("Simpan"),edit=UIUtils.secondaryButton("Edit"),hapus=UIUtils.dangerButton("Hapus");b.add(tambah);b.add(simpan);b.add(edit);b.add(hapus);g.gridx=0;g.gridy=4;g.gridwidth=2;p.add(b,g);tambah.addActionListener(e->clear());simpan.addActionListener(e->save());edit.addActionListener(e->update());hapus.addActionListener(e->delete());return p;}
+ private JPanel tabel(){JPanel p=UIUtils.card();p.setLayout(new BorderLayout(8,8));JPanel t=UIUtils.toolbar();JButton refresh=UIUtils.secondaryButton("Refresh");t.add(new JLabel("Cari"));t.add(cari);t.add(refresh);p.add(t,BorderLayout.NORTH);p.add(UIUtils.tableScroll(table),BorderLayout.CENTER);UIUtils.bindRealtimeSearch(cari,m,table);refresh.addActionListener(e->{cari.setText("");load("");});table.getSelectionModel().addListSelectionListener(e->select());return p;}
+ private void row(JPanel p,GridBagConstraints g,int y,String l,Component comp){g.gridx=0;g.gridy=y;g.gridwidth=1;p.add(new JLabel(l),g);g.gridx=1;p.add(comp,g);}private User val(){return new User(id,nama.getText().trim(),username.getText().trim(),new String(password.getPassword()),role.getSelectedItem().toString());}private boolean valid(){return Validator.required("Nama",nama.getText())&&Validator.required("Username",username.getText())&&Validator.required("Password",new String(password.getPassword()));}
+ private void save(){if(!valid())return;try{c.insert(val());clear();load("");}catch(Exception e){msg(e);}}private void update(){if(id==0||!valid())return;try{c.update(val());clear();load("");}catch(Exception e){msg(e);}}private void delete(){if(id==0)return;if(JOptionPane.showConfirmDialog(this,"Hapus user?","Konfirmasi",JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION)try{c.delete(id);clear();load("");}catch(Exception e){msg(e);}}
+ private void load(String k){try{m.setRowCount(0);for(User u:c.getAll(k))m.addRow(new Object[]{u.getIdUser(),u.getNama(),u.getUsername(),u.getPassword(),u.getRole()});}catch(Exception e){msg(e);}}private void select(){int r=table.getSelectedRow();if(r>=0){r=table.convertRowIndexToModel(r);id=(int)m.getValueAt(r,0);nama.setText(m.getValueAt(r,1).toString());username.setText(m.getValueAt(r,2).toString());password.setText(m.getValueAt(r,3).toString());role.setSelectedItem(m.getValueAt(r,4).toString());}}private void clear(){id=0;nama.setText("");username.setText("");password.setText("");role.setSelectedIndex(0);table.clearSelection();}private void msg(Exception e){JOptionPane.showMessageDialog(this,"Terjadi kesalahan: "+e.getMessage());}}
+=======
 import controller.UserController;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -179,3 +190,4 @@ public class UserFrame extends JPanel {
     table.clearSelection();
   }
 }
+
