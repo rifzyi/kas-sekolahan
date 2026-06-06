@@ -8,6 +8,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -18,10 +19,10 @@ import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.Locale;
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -30,106 +31,115 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.SwingConstants;
+import javax.swing.border.AbstractBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.JTextComponent;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
-public final class UIUtils {
-  public static final Color SIDEBAR = new Color(0x1E3A8A);
-  public static final Color BACKGROUND = new Color(0xF8FAFC);
-  public static final Color LIGHT_BLUE = BACKGROUND;
+public class UIUtils {
+  public static final Color NAVY = new Color(0x0D47A1);
+  public static final Color BLUE = new Color(0x1565C0);
+  public static final Color CYAN = new Color(0x00BCD4);
+  public static final Color GREEN = new Color(0x2ECC71);
+  public static final Color ORANGE = new Color(0xF39C12);
+  public static final Color RED = new Color(0xE74C3C);
+  public static final Color WHITE = Color.WHITE;
+  public static final Color BACKGROUND = new Color(0xF5F7FA);
   public static final Color CARD = Color.WHITE;
-  public static final Color ACCENT = new Color(0x2563EB);
-  public static final Color TEXT = new Color(0x0F172A);
   public static final Color MUTED = new Color(0x64748B);
-  public static final Color DANGER = new Color(0xDC2626);
   public static final Font FONT = new Font("Segoe UI", Font.PLAIN, 14);
   public static final Font FONT_BOLD = new Font("Segoe UI", Font.BOLD, 14);
-  public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 24);
-  private static final NumberFormat CURRENCY = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("id-ID"));
+  public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 20);
+  private static final NumberFormat CURRENCY = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
 
   private UIUtils() {}
 
-  public static JLabel title(String text) {
-    JLabel label = new JLabel(text);
-    label.setFont(FONT_TITLE);
-    label.setForeground(TEXT);
-    return label;
-  }
-
-  public static JButton button(String text, Color background, Color foreground) {
-    JButton button = new JButton(text);
-    button.setFont(FONT_BOLD);
-    button.setForeground(foreground);
-    button.setBackground(background);
-    button.setFocusPainted(false);
-    button.setBorder(BorderFactory.createEmptyBorder(9, 14, 9, 14));
-    button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    return button;
-  }
-
-  public static JButton primaryButton(String text) { return button(text, ACCENT, Color.WHITE); }
-  public static JButton dangerButton(String text) { return button(text, DANGER, Color.WHITE); }
-
-  public static JButton secondaryButton(String text) {
-    JButton button = button(text, CARD, SIDEBAR);
-    button.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(0xCBD5E1)), BorderFactory.createEmptyBorder(8, 14, 8, 14)));
-    return button;
-  }
-
-  public static JTextField textField(int columns) {
-    JTextField field = new JTextField(columns);
-    field.setFont(FONT);
-    field.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(0xCBD5E1)), BorderFactory.createEmptyBorder(8, 10, 8, 10)));
-    return field;
-  }
-
   public static JPanel page(String title) {
-    JPanel panel = new JPanel(new BorderLayout(14, 14));
+    JPanel panel = new JPanel(new BorderLayout(0, 18));
     panel.setBackground(BACKGROUND);
-    panel.setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
-    panel.add(title(title), BorderLayout.NORTH);
+    panel.setBorder(BorderFactory.createEmptyBorder(22, 24, 22, 24));
+    JLabel label = new JLabel(title);
+    label.setFont(new Font("Segoe UI", Font.BOLD, 24));
+    label.setForeground(NAVY);
+    panel.add(label, BorderLayout.NORTH);
     return panel;
   }
 
   public static JPanel card() {
     JPanel panel = new JPanel();
     panel.setBackground(CARD);
-    panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(0xE2E8F0)), BorderFactory.createEmptyBorder(16, 16, 16, 16)));
+    panel.setBorder(new ShadowBorder());
     return panel;
+  }
+
+  public static JTextField textField(int columns) {
+    JTextField field = new JTextField(columns);
+    field.setFont(FONT);
+    field.setBorder(BorderFactory.createCompoundBorder(new RoundedBorder(new Color(0xD9E2EC), 12), BorderFactory.createEmptyBorder(8, 12, 8, 12)));
+    field.setPreferredSize(new Dimension(field.getPreferredSize().width, 38));
+    return field;
+  }
+
+  public static JButton button(String text, Color color) {
+    JButton button = new JButton(text);
+    button.setFont(FONT_BOLD);
+    button.setForeground(WHITE);
+    button.setBackground(color);
+    button.setOpaque(true);
+    button.setFocusPainted(false);
+    button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    button.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
+    return button;
+  }
+
+  public static JLabel formLabel(String text) {
+    JLabel label = new JLabel(text);
+    label.setFont(FONT_BOLD);
+    label.setForeground(new Color(0x334155));
+    return label;
   }
 
   public static JScrollPane tableScroll(JTable table) {
     table.setFont(FONT);
-    table.setRowHeight(30);
-    table.setGridColor(new Color(0xE2E8F0));
-    table.setSelectionBackground(new Color(0xDBEAFE));
-    table.setSelectionForeground(TEXT);
+    table.setRowHeight(32);
+    table.setGridColor(new Color(0xE5E7EB));
+    table.setSelectionBackground(new Color(0xBBDEFB));
+    table.setSelectionForeground(new Color(0x0F172A));
+    table.setShowVerticalLines(false);
     JTableHeader header = table.getTableHeader();
+    header.setBackground(BLUE);
+    header.setForeground(WHITE);
     header.setFont(FONT_BOLD);
-    header.setBackground(SIDEBAR);
-    header.setForeground(Color.WHITE);
-    DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-    renderer.setHorizontalAlignment(JLabel.CENTER);
-    table.setDefaultRenderer(Object.class, renderer);
+    header.setPreferredSize(new Dimension(header.getPreferredSize().width, 38));
+    DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) header.getDefaultRenderer();
+    renderer.setHorizontalAlignment(SwingConstants.LEFT);
     JScrollPane scroll = new JScrollPane(table);
-    scroll.setPreferredSize(new Dimension(780, 330));
+    scroll.setBorder(BorderFactory.createLineBorder(new Color(0xE2E8F0)));
+    scroll.getViewport().setBackground(WHITE);
     return scroll;
   }
 
-  public static JPanel toolbar() {
-    JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+  public static JPanel toolbar(JTextField search, JButton... buttons) {
+    JPanel panel = new JPanel(new BorderLayout(12, 0));
     panel.setOpaque(false);
+    JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+    left.setOpaque(false);
+    for (JButton button : buttons) left.add(button);
+    JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+    right.setOpaque(false);
+    right.add(new JLabel("Cari Data:"));
+    right.add(search);
+    panel.add(left, BorderLayout.WEST);
+    panel.add(right, BorderLayout.EAST);
     return panel;
   }
 
-  public static void bindRealtimeSearch(JTextField field, DefaultTableModel model, JTable table) {
-    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
-    table.setRowSorter(sorter);
+  public static void bindSearch(JTextField field, TableRowSorter<?> sorter) {
     field.getDocument().addDocumentListener(new DocumentListener() {
       private void filter() {
         String text = field.getText().trim();
@@ -141,21 +151,29 @@ public final class UIUtils {
     });
   }
 
+  public static void setField(JTextComponent field, String value) { field.setText(value == null ? "" : value); }
   public static String rupiah(double value) { return CURRENCY.format(value); }
 
   public static ImageIcon schoolLogo(int size) {
     BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = image.createGraphics();
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g.setColor(SIDEBAR);
+    g.setColor(WHITE);
     g.fillOval(0, 0, size - 1, size - 1);
-    g.setColor(Color.WHITE);
-    g.setFont(new Font("Segoe UI", Font.BOLD, Math.max(14, size / 5)));
+    g.setColor(NAVY);
+    g.setFont(new Font("Segoe UI", Font.BOLD, Math.max(14, size / 3)));
     String text = "MI";
     int w = g.getFontMetrics().stringWidth(text);
-    g.drawString(text, (size - w) / 2, size / 2 + g.getFontMetrics().getAscent() / 3);
+    g.drawString(text, (size - w) / 2, size / 2 + g.getFontMetrics().getAscent() / 3 - 2);
     g.dispose();
     return new ImageIcon(image);
+  }
+
+  public static void installFlatLafIfAvailable() {
+    try {
+      Class<?> laf = Class.forName("com.formdev.flatlaf.FlatLightLaf");
+      laf.getMethod("setup").invoke(null);
+    } catch (Exception ignored) {}
   }
 
   public static class Option {
@@ -163,6 +181,7 @@ public final class UIUtils {
     private final String label;
     public Option(int id, String label) { this.id = id; this.label = label; }
     public int getId() { return id; }
+    public String getLabel() { return label; }
     @Override public String toString() { return label; }
   }
 
@@ -171,8 +190,7 @@ public final class UIUtils {
     chooser.setFileFilter(new FileNameExtensionFilter("PDF Document", "pdf"));
     if (chooser.showSaveDialog(parent) != JFileChooser.APPROVE_OPTION) return null;
     File file = chooser.getSelectedFile();
-    if (!file.getName().toLowerCase().endsWith(".pdf")) file = new File(file.getParentFile(), file.getName() + ".pdf");
-    return file;
+    return file.getName().toLowerCase().endsWith(".pdf") ? file : new File(file.getParentFile(), file.getName() + ".pdf");
   }
 
   public static void exportTableToPdf(Component parent, JTable table, String title, String summary) {
@@ -183,18 +201,16 @@ public final class UIUtils {
       if (Desktop.isDesktopSupported()) Desktop.getDesktop().open(file);
       JOptionPane.showMessageDialog(parent, "PDF berhasil dibuat: " + file.getAbsolutePath());
     } catch (Exception ex) {
-      JOptionPane.showMessageDialog(parent, "Gagal export PDF: " + ex.getMessage(), "Export PDF", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(parent, "Gagal cetak PDF: " + ex.getMessage(), "Cetak PDF", JOptionPane.ERROR_MESSAGE);
     }
   }
 
   private static void writeSimplePdf(File file, JTable table, String title, String summary) throws Exception {
-    StringBuilder text = new StringBuilder(title).append("\n").append("Tanggal cetak: ").append(LocalDate.now()).append("\n").append(summary).append("\n\n");
+    StringBuilder text = new StringBuilder(title).append("\nTanggal cetak: ").append(LocalDate.now()).append("\n").append(summary).append("\n\n");
     for (int c = 0; c < table.getColumnCount(); c++) text.append(table.getColumnName(c)).append(c == table.getColumnCount() - 1 ? "\n" : " | ");
-    int maxRows = Math.min(table.getRowCount(), 35);
-    for (int r = 0; r < maxRows; r++) {
-      for (int c = 0; c < table.getColumnCount(); c++) text.append(String.valueOf(table.getValueAt(r, c))).append(c == table.getColumnCount() - 1 ? "\n" : " | ");
+    for (int r = 0; r < Math.min(table.getRowCount(), 40); r++) {
+      for (int c = 0; c < table.getColumnCount(); c++) text.append(table.getValueAt(r, c)).append(c == table.getColumnCount() - 1 ? "\n" : " | ");
     }
-    if (table.getRowCount() > maxRows) text.append("... ").append(table.getRowCount() - maxRows).append(" baris lainnya\n");
     String[] lines = text.toString().split("\n");
     StringBuilder stream = new StringBuilder("BT /F1 10 Tf 40 790 Td 12 TL\n");
     for (String line : lines) stream.append("(").append(escapePdf(line.length() > 115 ? line.substring(0, 115) : line)).append(") Tj T*\n");
@@ -216,11 +232,30 @@ public final class UIUtils {
 
   private static String escapePdf(String text) { return text.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)"); }
 
-  public static void saveLogo(Component parent, File source, File target) {
-    try {
-      if (source != null) ImageIO.write(ImageIO.read(source), "png", target);
-    } catch (Exception ex) {
-      JOptionPane.showMessageDialog(parent, "Gagal menyimpan logo: " + ex.getMessage());
+  private static class RoundedBorder extends AbstractBorder {
+    private final Color color;
+    private final int radius;
+    RoundedBorder(Color color, int radius) { this.color = color; this.radius = radius; }
+    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+      Graphics2D g2 = (Graphics2D) g.create();
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      g2.setColor(color);
+      g2.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
+      g2.dispose();
     }
+  }
+
+  private static class ShadowBorder extends AbstractBorder {
+    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+      Graphics2D g2 = (Graphics2D) g.create();
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      g2.setColor(new Color(0, 0, 0, 18));
+      g2.fillRoundRect(x + 3, y + 4, width - 6, height - 7, 22, 22);
+      g2.setColor(CARD);
+      g2.fillRoundRect(x, y, width - 7, height - 8, 22, 22);
+      g2.dispose();
+    }
+    public java.awt.Insets getBorderInsets(Component c) { return new java.awt.Insets(16, 16, 18, 18); }
+    public java.awt.Insets getBorderInsets(Component c, java.awt.Insets insets) { insets.set(16, 16, 18, 18); return insets; }
   }
 }
