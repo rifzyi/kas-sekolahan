@@ -11,13 +11,10 @@ import util.Koneksi;
 public class AuthController {
     public User login(String username, String password) throws SQLException {
         String sql = "SELECT id_user, nama, username, password, role FROM users WHERE username = ? AND password = ?";
-        try (Connection connection = Koneksi.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, username);
-            statement.setString(2, password);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return new User(resultSet.getInt("id_user"), resultSet.getString("nama"), resultSet.getString("username"), resultSet.getString("password"), resultSet.getString("role"));
-                }
+        try (Connection c = Koneksi.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, username); ps.setString(2, password);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return new User(rs.getInt("id_user"), rs.getString("nama"), rs.getString("username"), rs.getString("password"), rs.getString("role"));
             }
         }
         return null;

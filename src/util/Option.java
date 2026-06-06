@@ -1,7 +1,7 @@
 // File: util/Option.java
 package util;
 
-/** Item id-label untuk JComboBox. */
+/** Helper item JComboBox yang menyimpan id database dan teks tampilan. */
 public class Option {
     private final int id;
     private final String text;
@@ -11,20 +11,7 @@ public class Option {
         this.text = text;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public String getLabel() {
-        return text;
-    }
-
-    @Override
-    public String toString() {
-        return text;
-    }
+    public int getId() { return id; }
+    public String getText() { return text; }
+    @Override public String toString() { return text; }
 }
