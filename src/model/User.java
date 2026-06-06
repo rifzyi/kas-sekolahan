@@ -8,17 +8,10 @@ public class User {
     private String password;
     private String role;
 
-    public User() {
-    }
-
+    public User() {}
     public User(int idUser, String nama, String username, String password, String role) {
-        this.idUser = idUser;
-        this.nama = nama;
-        this.username = username;
-        this.password = password;
-        this.role = role;
+        this.idUser = idUser; this.nama = nama; this.username = username; this.password = password; this.role = role;
     }
-
     public int getIdUser() { return idUser; }
     public void setIdUser(int idUser) { this.idUser = idUser; }
     public String getNama() { return nama; }

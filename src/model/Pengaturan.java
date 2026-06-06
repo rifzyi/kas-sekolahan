@@ -6,25 +6,13 @@ public class Pengaturan {
     private String namaSekolah;
     private String alamat;
     private String telepon;
-    private String email;
     private String kepalaSekolah;
     private String bendahara;
-    private String logoPath;
 
-    public Pengaturan() {
+    public Pengaturan() {}
+    public Pengaturan(int idPengaturan, String namaSekolah, String alamat, String telepon, String kepalaSekolah, String bendahara) {
+        this.idPengaturan = idPengaturan; this.namaSekolah = namaSekolah; this.alamat = alamat; this.telepon = telepon; this.kepalaSekolah = kepalaSekolah; this.bendahara = bendahara;
     }
-
-    public Pengaturan(int idPengaturan, String namaSekolah, String alamat, String telepon, String email, String kepalaSekolah, String bendahara, String logoPath) {
-        this.idPengaturan = idPengaturan;
-        this.namaSekolah = namaSekolah;
-        this.alamat = alamat;
-        this.telepon = telepon;
-        this.email = email;
-        this.kepalaSekolah = kepalaSekolah;
-        this.bendahara = bendahara;
-        this.logoPath = logoPath;
-    }
-
     public int getIdPengaturan() { return idPengaturan; }
     public void setIdPengaturan(int idPengaturan) { this.idPengaturan = idPengaturan; }
     public String getNamaSekolah() { return namaSekolah; }
@@ -33,12 +21,8 @@ public class Pengaturan {
     public void setAlamat(String alamat) { this.alamat = alamat; }
     public String getTelepon() { return telepon; }
     public void setTelepon(String telepon) { this.telepon = telepon; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
     public String getKepalaSekolah() { return kepalaSekolah; }
     public void setKepalaSekolah(String kepalaSekolah) { this.kepalaSekolah = kepalaSekolah; }
     public String getBendahara() { return bendahara; }
     public void setBendahara(String bendahara) { this.bendahara = bendahara; }
-    public String getLogoPath() { return logoPath; }
-    public void setLogoPath(String logoPath) { this.logoPath = logoPath; }
 }
